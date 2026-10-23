@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashKart | Instant Grocery Delivery</title>
+<style>
+:root{--purple:#5c238d;--green:#0c831f;--light:#f7f7f7;--dark:#222}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;color:var(--dark);background:#fff}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+header{position:sticky;top:0;background:#fff;z-index:20;box-shadow:0 2px 10px #0000000c}
+.topbar{display:flex;align-items:center;gap:25px;padding:15px 5%;border-bottom:1px solid #eee}
+.logo{font-size:27px;font-weight:900;color:var(--purple);white-space:nowrap}
+.logo span{color:#ffcb39}
+.location{min-width:150px;font-size:13px}
+.location strong{display:block;font-size:15px;margin-bottom:4px}
+.search{flex:1;display:flex;background:#f5f5f5;border:1px solid #eee;border-radius:10px;padding:12px;gap:10px}
+.search input{width:100%;border:0;background:transparent;outline:none}
+.header-actions{display:flex;gap:12px;align-items:center}
+.header-actions button{border:0;background:#fff;padding:10px;border-radius:9px}
+.cart-button{background:var(--green)!important;color:#fff;font-weight:bold}
+.nav{display:flex;gap:25px;padding:12px 5%;overflow-x:auto;white-space:nowrap}
+.nav a{font-size:14px;color:#555}
+.nav a:hover{color:var(--green)}
+main{max-width:1400px;margin:auto;padding:20px 5%}
+.hero{background:linear-gradient(120deg,#e8d9ff,#f5ebff);border-radius:20px;padding:35px;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:230px;overflow:hidden}
+.hero h1{font-size:clamp(27px,4vw,45px);color:#36204b;margin-bottom:12px}
+.hero p{color:#555;line-height:1.7}
+.hero .cta{margin-top:20px;padding:12px 22px;background:var(--purple);color:#fff;border:0;border-radius:9px}
+.hero-art{font-size:95px}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:32px 0 18px}
+.section-title h2{font-size:23px}
+.categories{display:grid;grid-template-columns:repeat(8,minmax(75px,1fr));gap:14px}
+.category{background:#f6f6f6;border-radius:13px;padding:17px 8px;text-align:center;border:1px solid transparent}
+.category:hover{border-color:#c9a6ed;background:#faf5ff}
+.category .emoji{font-size:36px;margin-bottom:10px}
+.category p{font-size:13px;font-weight:600}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.toolbar input,.toolbar select{padding:10px;border:1px solid #ddd;border-radius:8px;background:#fff}
+.products{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.product{border:1px solid #eee;border-radius:13px;padding:12px;position:relative;transition:.2s;min-width:0}
+.product:hover{box-shadow:0 5px 20px #0000000d;transform:translateY(-2px)}
+.product-image{height:145px;background:#fafafa;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:65px;margin-bottom:12px}
+.delivery{font-size:10px;color:#666;margin-bottom:10px}
+.product h3{font-size:14px;line-height:1.45;min-height:40px}
+.quantity{font-size:12px;color:#888;margin:7px 0 12px}
+.price-row{display:flex;align-items:center;justify-content:space-between;gap:5px}
+.price{font-weight:bold;font-size:15px}
+.old-price{font-size:11px;color:#999;text-decoration:line-through;margin-top:4px}
+.add-btn{border:1px solid var(--green);background:#fff;color:var(--green);border-radius:7px;padding:8px 15px;font-weight:bold}
+.add-btn:hover{background:var(--green);color:#fff}
+.badge{position:absolute;top:8px;left:8px;background:#e9f7eb;color:var(--green);padding:5px;border-radius:5px;font-size:10px}
+.empty{padding:35px;text-align:center;color:#777;grid-column:1/-1}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:35px 0}
+.feature{padding:20px;background:#f8f8f8;border-radius:12px}
+.feature strong{display:block;margin-bottom:7px}
+.feature p{font-size:13px;color:#666;line-height:1.6}
+footer{background:#f8f8f8;padding:35px 5%;margin-top:40px}
+.footer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:25px}
+.footer-grid h3{font-size:15px;margin-bottom:14px}
+.footer-grid p,.footer-grid a{display:block;font-size:13px;color:#666;margin:9px 0}
+.copyright{text-align:center;border-top:1px solid #ddd;margin-top:25px;padding-top:20px;font-size:12px;color:#777}
+.overlay{position:fixed;inset:0;background:#0007;z-index:40;display:none}
+.overlay.show{display:block}
+.drawer{position:fixed;right:-460px;top:0;height:100%;width:min(440px,100%);background:#fff;z-index:50;transition:right .25s;display:flex;flex-direction:column}
+.drawer.show{right:0}
+.drawer-head{padding:20px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.drawer-body{padding:18px;overflow-y:auto;flex:1}
+.drawer-foot{padding:18px;border-top:1px solid #eee}
+.close-btn{border:0;background:#f3f3f3;border-radius:8px;padding:8px 12px}
+.cart-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #eee;align-items:center}
+.cart-emoji{font-size:35px}
+.cart-info{flex:1}
+.cart-info strong{font-size:14px}
+.cart-info p{margin-top:6px;font-size:13px}
+.qty-control{display:flex;align-items:center;gap:10px}
+.qty-control button{border:1px solid #ddd;background:white;color:var(--green);padding:5px 10px;border-radius:5px}
+.summary-line{display:flex;justify-content:space-between;margin:12px 0;font-size:14px}
+.grand-total{font-weight:bold;font-size:17px;padding-top:12px;border-top:1px solid #eee}
+.checkout-btn{width:100%;padding:14px;background:var(--green);color:#fff;border:0;border-radius:9px;font-weight:bold;margin-top:15px}
+.modal{position:fixed;inset:0;z-index:60;background:#0007;display:none;align-items:center;justify-content:center;padding:15px}
+.modal.show{display:flex}
+.modal-box{background:#fff;padding:25px;border-radius:16px;width:min(450px,100%);max-height:90vh;overflow-y:auto}
+.modal-box h2{margin-bottom:18px}
+.modal-box label{display:block;font-size:13px;margin:14px 0 6px}
+.modal-box input,.modal-box select,.modal-box textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px}
+.modal-box button.primary{background:var(--green);color:white;border:0;border-radius:8px;padding:13px;width:100%;margin-top:15px}
+.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:13px 20px;border-radius:10px;z-index:100;display:none;max-width:90%;text-align:center}
+.toast.show{display:block}
+.mobile-bottom{display:none}
+@media(max-width:1000px){.products{grid-template-columns:repeat(4,minmax(0,1fr))}.categories{grid-template-columns:repeat(4,1fr)}.topbar{gap:12px;padding:12px 4%}.location{min-width:110px}.hero-art{font-size:65px}}
+@media(max-width:650px){.topbar{flex-wrap:wrap;gap:10px;padding:12px 4%}.logo{font-size:23px}.location{flex:1}.header-actions{margin-left:auto}.search{order:3;flex-basis:100%}.nav{gap:18px;padding:12px 4%}main{padding:15px 4%}.hero{padding:24px;min-height:185px}.hero-art{font-size:48px}.hero h1{font-size:26px}.categories{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.category{padding:13px 5px}.category .emoji{font-size:28px}.category p{font-size:11px}.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.product{padding:9px}.product-image{height:120px;font-size:55px}.product h3{font-size:13px}.add-btn{padding:7px 12px}.features{grid-template-columns:1fr}.footer-grid{grid-template-columns:repeat(2,1fr)}.mobile-bottom{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:19;background:#fff;border-top:1px solid #eee;justify-content:space-around;padding:10px 0}.mobile-bottom button{border:0;background:none;font-size:12px;display:flex;flex-direction:column;gap:5px;align-items:center}.mobile-bottom span{font-size:20px}footer{padding-bottom:80px}.section-title h2{font-size:20px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <a href="#" class="logo" onclick="showHome();return false">Flash<span>●</span>Kart</a>
+    <button class="location" onclick="openLocation()" style="background:none;border:0;text-align:left">
+      <strong>📍 <span id="locationText">Select Location</span></strong>
+      <span style="color:#777;font-size:12px">Delivery address ⌄</span>
+    </button>
+    <div class="header-actions">
+      <button onclick="openAccount()">👤 <span class="desktop-text">Login</span></button>
+      <button class="cart-button" onclick="openCart()">🛒 <span id="cartCount">Cart (0)</span></button>
+    </div>
+    <div class="search">
+      🔍 <input id="searchInput" type="search" placeholder="Search for milk, fruits, snacks..." oninput="renderProducts()">
+      <button onclick="document.getElementById('searchInput').value='';renderProducts()" style="border:0;background:none">✕</button>
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="#categories">All Categories</a>
+    <a href="#products" onclick="setCategory('Fruits & Vegetables')">Fresh Produce</a>
+    <a href="#products" onclick="setCategory('Dairy & Eggs')">Dairy</a>
+    <a href="#products" onclick="setCategory('Snacks')">Snacks</a>
+    <a href="#products" onclick="setCategory('Beverages')">Beverages</a>
+    <a href="#products" onclick="setCategory('Personal Care')">Personal Care</a>
+    <a href="#products" onclick="setCategory('Household')">Household</a>
+  </nav>
+</header>
+
+<main id="home">
+  <section class="hero">
+    <div>
+      <p style="font-weight:bold;color:#63308a">⚡ FAST DELIVERY · FRESH EVERY DAY</p>
+      <h1>Groceries delivered<br>to your doorstep.</h1>
+      <p>Your daily essentials, fresh picks and favourite snacks in one place.</p>
+      <button class="cta" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Shop Now →</button>
+    </div>
+    <div class="hero-art">🛍️🥑</div>
+  </section>
+
+  <div class="section-title" id="categories">
+    <h2>Shop by Category</h2>
+  </div>
+  <section class="categories" id="categoryGrid"></section>
+
+  <div class="section-title" id="products">
+    <h2 id="productHeading">Popular Products</h2>
+    <button onclick="setCategory('All')" style="border:0;background:none;color:var(--green)">View all →</button>
+  </div>
+
+  <div class="toolbar">
+    <select id="sortSelect" onchange="renderProducts()">
+      <option value="default">Sort: Recommended</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+      <option value="name">Name: A to Z</option>
+    </select>
+    <select id="categoryFilter" onchange="setCategory(this.value)">
+      <option value="All">All Categories</option>
+    </select>
+  </div>
+
+  <section class="products" id="productGrid"></section>
+
+  <section class="features">
+    <div class="feature"><strong>⚡ Fast Delivery</strong><p>Convenient delivery windows for your daily shopping.</p></div>
+    <div class="feature"><strong>🥬 Fresh Quality</strong><p>Carefully selected essentials for your household.</p></div>
+    <div class="feature"><strong>🔒 Secure Checkout</strong><p>Simple checkout with clear order totals.</p></div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div><h3 class="logo">Flash<span>●</span>Kart</h3><p>Your everyday grocery destination.</p></div>
+    <div><h3>Useful Links</h3><a href="#home">Home</a><a href="#categories">Categories</a><a href="#products">Products</a><a href="#" onclick="openOrders();return false">My Orders</a></div>
+    <div><h3>Customer Support</h3><a href="#" onclick="showToast('Email: support@example.com');return false">Contact Us</a><a href="#" onclick="showToast('Returns are subject to store policy.');return false">Returns & Refunds</a><a href="#" onclick="showToast('This is a demo storefront.');return false">FAQs</a></div>
+    <div><h3>Newsletter</h3><p>Get updates on offers and new products.</p><form onsubmit="event.preventDefault();showToast('Thanks for subscribing! (Demo)');this.reset()"><input required type="email" placeholder="Your email" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin:8px 0"><button class="checkout-btn" style="margin:0">Subscribe</button></form></div>
+  </div>
+  <div class="copyright">© 2026 FlashKart. Demo grocery storefront. Not affiliated with Zepto.</div>
+</footer>
+
+<nav class="mobile-bottom">
+  <button onclick="showHome()"><span>🏠</span>Home</button>
+  <button onclick="document.getElementById('categories').scrollIntoView({behavior:'smooth'})"><span>▦</span>Categories</button>
+  <button onclick="openOrders()"><span>📦</span>Orders</button>
+  <button onclick="openAccount()"><span>👤</span>Account</button>
+  <button onclick="openCart()"><span>🛒</span>Cart</button>
+</nav>
+
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+<aside class="drawer" id="cartDrawer">
+  <div class="drawer-head"><h2>Your Cart</h2><button class="close-btn" onclick="closeCart()">✕</button></div>
+  <div class="drawer-body" id="cartItems"></div>
+  <div class="drawer-foot" id="cartSummary"></div>
+</aside>
+
+<div class="modal" id="genericModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box" id="modalContent"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const categories=[
+ {name:'Fruits & Vegetables',emoji:'🥦'},
+ {name:'Dairy & Eggs',emoji:'🥛'},
+ {name:'Bakery',emoji:'🍞'},
+ {name:'Snacks',emoji:'🍿'},
+ {name:'Beverages',emoji:'🥤'},
+ {name:'Personal Care',emoji:'🧴'},
+ {name:'Household',emoji:'🧹'},
+ {name:'Staples',emoji:'🌾'}
+];
+
+const products=[
+ {id:1,name:'Fresh Bananas',qty:'6 pcs',price:40,old:50,emoji:'🍌',cat:'Fruits & Vegetables'},
+ {id:2,name:'Red Apples',qty:'4 pcs',price:120,old:150,emoji:'🍎',cat:'Fruits & Vegetables'},
+ {id:3,name:'Fresh Tomatoes',qty:'500 g',price:30,old:40,emoji:'🍅',cat:'Fruits & Vegetables'},
+ {id:4,name:'Potatoes',qty:'1 kg',price:35,old:45,emoji:'🥔',cat:'Fruits & Vegetables'},
+ {id:5,name:'Fresh Milk',qty:'500 ml',price:30,old:32,emoji:'🥛',cat:'Dairy & Eggs'},
+ {id:6,name:'Farm Eggs',qty:'6 pcs',price:60,old:70,emoji:'🥚',cat:'Dairy & Eggs'},
+ {id:7,name:'Butter',qty:'100 g',price:58,old:65,emoji:'🧈',cat:'Dairy & Eggs'},
+ {id:8,name:'Cheese Slices',qty:'200 g',price:115,old:130,emoji:'🧀',cat:'Dairy & Eggs'},
+ {id:9,name:'White Bread',qty:'400 g',price:40,old:45,emoji:'🍞',cat:'Bakery'},
+ {id:10,name:'Chocolate Cake',qty:'250 g',price:150,old:180,emoji:'🍰',cat:'Bakery'},
+ {id:11,name:'Potato Chips',qty:'Pack of 1',price:20,old:25,emoji:'🍟',cat:'Snacks'},
+ {id:12,name:'Chocolate Bar',qty:'50 g',price:40,old:50,emoji:'🍫',cat:'Snacks'},
+ {id:13,name:'Cookies',qty:'200 g',price:55,old:65,emoji:'🍪',cat:'Snacks'},
+ {id:14,name:'Instant Noodles',qty:'Pack of 2',price:30,old:35,emoji:'🍜',cat:'Snacks'},
+ {id:15,name:'Orange Juice',qty:'1 L',price:110,old:130,emoji:'🧃',cat:'Beverages'},
+ {id:16,name:'Mineral Water',qty:'1 L',price:20,old:25,emoji:'💧',cat:'Beverages'},
+ {id:17,name:'Tea',qty:'250 g',price:125,old:145,emoji:'🍵',cat:'Beverages'},
+ {id:18,name:'Coffee',qty:'100 g',price:160,old:185,emoji:'☕',cat:'Beverages'},
+ {id:19,name:'Shampoo',qty:'180 ml',price:145,old:170,emoji:'🧴',cat:'Personal Care'},
+ {id:20,name:'Bath Soap',qty:'Pack of 4',price:110,old:125,emoji:'🧼',cat:'Personal Care'},
+ {id:21,name:'Toothpaste',qty:'150 g',price:95,old:110,emoji:'🪥',cat:'Personal Care'},
+ {id:22,name:'Laundry Detergent',qty:'1 kg',price:130,old:155,emoji:'🫧',cat:'Household'},
+ {id:23,name:'Dishwashing Liquid',qty:'500 ml',price:85,old:100,emoji:'🧽',cat:'Household'},
+ {id:24,name:'Rice',qty:'1 kg',price:75,old:90,emoji:'🍚',cat:'Staples'},
+ {id:25,name:'Wheat Flour',qty:'5 kg',price:240,old:280,emoji:'🌾',cat:'Staples'},
+ {id:26,name:'Cooking Oil',qty:'1 L',price:145,old:165,emoji:'🫗',cat:'Staples'},
+ {id:27,name:'Sugar',qty:'1 kg',price:48,old:55,emoji:'🧂',cat:'Staples'},
+ {id:28,name:'Green Grapes',qty:'500 g',price:80,old:100,emoji:'🍇',cat:'Fruits & Vegetables'},
+ {id:29,name:'Fresh Carrots',qty:'500 g',price:35,old:45,emoji:'🥕',cat:'Fruits & Vegetables'},
+ {id:30,name:'Yogurt',qty:'400 g',price:45,old:55,emoji:'🥣',cat:'Dairy & Eggs'}
+];
+
+let cart={};
+let activeCategory='All';
+let address='';
+let customer=null;
+let orders=[];
+
+try{
+ cart=JSON.parse(localStorage.getItem('flashkart_cart')||'{}');
+ address=localStorage.getItem('flashkart_address')||'';
+ customer=JSON.parse(localStorage.getItem('flashkart_customer')||'null');
+ orders=JSON.parse(localStorage.getItem('flashkart_orders')||'[]');
+}catch(e){cart={};orders=[]}
+
+function save(){
+ try{
+  localStorage.setItem('flashkart_cart',JSON.stringify(cart));
+  localStorage.setItem('flashkart_address',address);
+  localStorage.setItem('flashkart_customer',JSON.stringify(customer));
+  localStorage.setItem('flashkart_orders',JSON.stringify(orders));
+ }catch(e){}
+}
+function rupee(n){return '₹'+Number(n).toLocaleString('en-IN')}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+function init(){
+ document.getElementById('categoryGrid').innerHTML=categories.map(c=>`
+  <button class="category" onclick="setCategory('${c.name.replace(/'/g,"\\'")}')">
+   <div class="emoji">${c.emoji}</div><p>${c.name}</p>
+  </button>`).join('');
+ document.getElementById('categoryFilter').innerHTML=
+  '<option value="All">All Categories</option>'+categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
+ updateHeader();
+ renderProducts();
+}
+
+function updateHeader(){
+ document.getElementById('locationText').textContent=address?address.split(',')[0]:'Select Location';
+ document.getElementById('cartCount').textContent=`Cart (${Object.values(cart).reduce((a,b)=>a+b,0)})`;
+}
+
+function setCategory(cat){
+ activeCategory=cat;
+ document.getElementById('categoryFilter').value=cat;
+ document.getElementById('productHeading').textContent=cat==='All'?'Popular Products':cat;
+ renderProducts();
+}
+
+function renderProducts(){
+ const q=document.getElementById('searchInput').value.trim().toLowerCase();
+ const sort=document.getElementById('sortSelect').value;
+ let list=products.filter(p=>(activeCategory==='All'||p.cat===activeCategory)&&
+ (p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)));
+ if(sort==='low')list.sort((a,b)=>a.price-b.price);
+ if(sort==='high')list.sort((a,b)=>b.price-a.price);
+ if(sort==='name')list.sort((a,b)=>a.name.localeCompare(b.name));
+ document.getElementById('productGrid').innerHTML=list.length?list.map(p=>`
+  <article class="product">
+   <span class="badge">${Math.round((p.old-p.price)/p.old*100)}% OFF</span>
+   <div class="product-image">${p.emoji}</div>
+   <div class="delivery">⚡ Delivery estimate varies</div>
+   <h3>${p.name}</h3>
+   <div class="quantity">${p.qty}</div>
+   <div class="price-row">
+    <div><div class="price">${rupee(p.price)}</div><div class="old-price">${rupee(p.old)}</div></div>
+    ${cart[p.id]?`<div class="qty-control"><button onclick="changeQty(${p.id},-1)">−</button><span>${cart[p.id]}</span><button onclick="changeQty(${p.id},1)">+</button></div>`:`<button class="add-btn" onclick="changeQty(${p.id},1)">ADD +</button>`}
+   </div>
+  </article>`).join(''):'<div class="empty">No products found. Try another search.</div>';
+}
+
+function changeQty(id,delta){
+ cart[id]=(cart[id]||0)+delta;
+ if(cart[id]<=0)delete cart[id];
+ save();updateHeader();renderProducts();
+ if(document.getElementById('cartDrawer').classList.contains('show'))renderCart();
+}
+
+function openCart(){
+ document.getElementById('overlay').classList.add('show');
+ document.getElementById('cartDrawer').classList.add('show');
+ renderCart();
+}
+function closeCart(){
+ document.getElementById('overlay').classList.remove('show');
+ document.getElementById('cartDrawer').classList.remove('show');
+}
+
+function renderCart(){
+ const items=Object.entries(cart).map(([id,q])=>({p:products.find(p=>p.id===Number(id)),q})).filter(x=>x.p);
+ const count=items.reduce((a,x)=>a+x.q,0);
+ const subtotal=items.reduce((a,x)=>a+x.p.price*x.q,0);
+ const delivery=subtotal===0||subtotal>=299?0:25;
+ const total=subtotal+delivery;
+ document.getElementById('cartItem
